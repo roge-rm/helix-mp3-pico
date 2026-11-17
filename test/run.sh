@@ -32,8 +32,20 @@ if command -v ffmpeg > /dev/null && ffmpeg -hide_banner -encoders 2>/dev/null | 
     gen mono 32000 3 -ac 1 -c:a libmp3lame -q:a 5
     gen mpeg2 22050 3 -c:a libmp3lame -b:a 64k
     gen mpeg2mono 16000 3 -ac 1 -c:a libmp3lame -b:a 24k
+    gen mpeg25 11025 3 -c:a libmp3lame -b:a 32k
+    gen mpeg25mono 8000 3 -ac 1 -c:a libmp3lame -b:a 16k
 else
     echo "no ffmpeg with libmp3lame, only sine_mp3 checked"
 fi
+FUZZ=$(ls "$DIR"/{mpeg2,mpeg25,mpeg25mono}.mp3 2>/dev/null)
+for b in ref pico; do
+    echo "== fuzz $b"
+    if UBSAN_OPTIONS=print_stacktrace=1 "$OUT/fuzz_$b" $FUZZ > "$DIR/fuzz_$b.log" 2>&1; then
+        tail -1 "$DIR/fuzz_$b.log" | sed 's/^/  /'
+    else
+        head -20 "$DIR/fuzz_$b.log" | sed 's/^/  /'
+        FAILS=$((FAILS + 1))
+    fi
+done
 echo "$FAILS failed"
 [ "$FAILS" = 0 ]

@@ -23,3 +23,8 @@ These files came to helix-mp3-pico from midiTracker
   Arduino.
 - helix_mp3_pico.h added: includes mp3dec.h and gives the sizes for static
   buffers (HELIX_MP3_POOL_BYTES, HELIX_MP3_PCM_SAMPLES).
+- MPEG-2.5 on and safer on bad data: mp3common.h takes the 11-bit
+  syncword; bitstream.c rejects the reserved version; mp3dec.c rejects
+  layers 1 and 2, short buffers, stale free-mode state and slot counts that
+  don't fit mainBuf; huffman.c and stproc.c keep table indexes in range on
+  a bad frame. test/fuzz.c runs random and bit-flipped data under ASan.

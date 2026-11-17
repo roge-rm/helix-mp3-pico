@@ -2,7 +2,7 @@
 
 A port of the RealNetworks Helix fixed-point MP3 decoder, packaged for the RP2040 (Raspberry Pi Pico) with Arduino-Pico, PlatformIO or the plain pico-sdk. It isn't an official Helix release and isn't affiliated with RealNetworks.
 
-It decodes MPEG-1 and MPEG-2 layer 3, mono or stereo, CBR or VBR, to 16-bit PCM. Layers 1 and 2 aren't supported, and MPEG-2.5 (8, 11 and 12 kHz) is off, as in upstream Helix.
+It decodes MPEG-1, MPEG-2 and MPEG-2.5 layer 3, mono or stereo, CBR or VBR, to 16-bit PCM. Layers 1 and 2 aren't supported.
 
 I wrote it up as a library from the copy I use in [midiTracker](https://github.com/roge-rm/midiTracker), which plays MP3s from an SD card on core 1.
 
@@ -62,7 +62,7 @@ if (err == 0) {
 
 - `HELIX_MP3_POOL_BYTES` is 25904, enough for the RP2040 (25864) and 64-bit hosts. The pool is one per program: call `MP3SetPool()` again before you start another decoder. `MP3FreeDecoder()` only forgets the pool, it's yours to reuse.
 - `MP3Decode()` decodes one frame and moves `p` and `left` past it. Give it at least one whole frame (up to 1441 bytes). When reading from a file, move what's left to the start of your buffer and top it up before each frame.
-- The PCM is signed 16-bit, interleaved L R L R for stereo. A frame is 1152 samples per channel for MPEG-1 and 576 for MPEG-2.
+- The PCM is signed 16-bit, interleaved L R L R for stereo. A frame is 1152 samples per channel for MPEG-1 and 576 for MPEG-2 and 2.5.
 - `ERR_MP3_INDATA_UNDERFLOW` means it needs more data. `ERR_MP3_MAINDATA_UNDERFLOW` is normal for the first frame or two after a start or seek, while the bit reservoir fills; skip it. For other errors skip a byte and find the next sync.
 - Helix trusts the stream. If your files might not be MP3s, check the frame header yourself before decoding, as midiTracker does.
 
@@ -80,7 +80,7 @@ From midiTracker's device profiling at 200 MHz with `-O2`: a 320 kbps stereo fil
 make -C test
 ```
 
-This builds the decoder twice on the host, once the way the RP2040 runs it (`MP3_POLY_SPLIT` and the 16-bit multiply in C) and once with the plain Helix C code, decodes the same MP3s with both and checks the PCM is the same to the bit and isn't silent. It also checks `MP3PoolBytes()` fits in `HELIX_MP3_POOL_BYTES`. The MP3s (CBR, VBR, joint stereo, mono, MPEG-2) are made with ffmpeg in build/test; without ffmpeg it only uses the example's MP3.
+This builds the decoder twice on the host, once the way the RP2040 runs it (`MP3_POLY_SPLIT` and the 16-bit multiply in C) and once with the plain Helix C code, decodes the same MP3s with both and checks the PCM is the same to the bit and isn't silent. It also checks `MP3PoolBytes()` fits in `HELIX_MP3_POOL_BYTES`. The MP3s (CBR, VBR, joint stereo, mono, MPEG-2, MPEG-2.5) are made with ffmpeg in build/test; without ffmpeg it only uses the example's MP3. Then it feeds random bytes and bit-flipped MP3s to both builds under ASan and UBSan, 3000 runs with a fixed seed.
 
 ## Licence
 
