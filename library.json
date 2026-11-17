@@ -1,0 +1,24 @@
+{
+  "name": "helix-mp3-pico",
+  "version": "1.0.0",
+  "description": "Helix fixed-point MP3 decoder for the RP2040, with no heap. Faster multiply and polyphase code for the Cortex-M0+, same output to the bit.",
+  "keywords": ["mp3", "decoder", "helix", "audio", "rp2040", "pico"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/roge-rm/helix-mp3-pico.git"
+  },
+  "authors": [
+    {
+      "name": "Dan Hunke",
+      "url": "https://github.com/roge-rm",
+      "maintainer": true
+    }
+  ],
+  "license": "RPSL-1.0",
+  "homepage": "https://github.com/roge-rm/helix-mp3-pico",
+  "frameworks": ["arduino"],
+  "platforms": ["raspberrypi"],
+  "export": {
+    "exclude": ["test", "build", ".pio"]
+  }
+}
